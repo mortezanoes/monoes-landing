@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 const navLinks = [
@@ -35,7 +36,13 @@ export function Navbar() {
         }}
       >
         <Link href="/" className="flex items-center gap-2">
-          <div className="gold-gradient h-7 w-7 rounded-full" />
+          <Image
+            src="/images/monkey/hero-full.jpg"
+            alt="Monoes"
+            width={28}
+            height={28}
+            className="h-7 w-7 rounded-full object-cover object-top"
+          />
           <span className="text-xs font-medium uppercase tracking-label text-espresso">
             Monoes
           </span>

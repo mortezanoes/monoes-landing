@@ -1,5 +1,13 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Project } from "@/lib/projects";
+
+const heroMonkeys: Record<string, string> = {
+  "mono-agent": "/images/monkey/dynamic-running.jpg",
+  "monobrain": "/images/monkey/gasp-of-awe.jpg",
+  "mono-clip": "/images/monkey/curious-tilt.jpg",
+  "monotask": "/images/monkey/jumping.jpg",
+};
 
 export function ProjectHero({ project }: { project: Project }) {
   return (
@@ -24,8 +32,14 @@ export function ProjectHero({ project }: { project: Project }) {
             </div>
           </div>
           <div className="hidden md:block">
-            <div className="flex h-48 w-48 items-center justify-center rounded-full border" style={{ borderColor: `${project.accent}30`, background: `radial-gradient(circle, ${project.accent}10, transparent)` }}>
-              <span className="text-7xl opacity-30">🐒</span>
+            <div className="flex h-48 w-48 items-center justify-center rounded-full border overflow-hidden" style={{ borderColor: `${project.accent}30`, background: `radial-gradient(circle, ${project.accent}10, transparent)` }}>
+              <Image
+                src={heroMonkeys[project.id] || "/images/monkey/hero-full.jpg"}
+                alt={`${project.name} mascot`}
+                width={192}
+                height={192}
+                className="w-full h-full object-cover object-top"
+              />
             </div>
           </div>
         </div>

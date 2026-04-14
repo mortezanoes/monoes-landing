@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
 import { TextReveal } from "@/components/ui/TextReveal";
 
 export function PhilosophySection() {
@@ -76,11 +77,14 @@ export function PhilosophySection() {
             <div
               className="w-full h-full rounded-full gold-gradient opacity-20 absolute inset-0 blur-3xl"
             />
-            <div className="w-full h-full rounded-full border border-gold/30 flex items-center justify-center gold-gradient opacity-60" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-6xl md:text-8xl select-none" aria-hidden>
-                ◎
-              </span>
+            <div className="w-full h-full rounded-full overflow-hidden border border-gold/30">
+              <Image
+                src="/images/monkey/contemplative.jpg"
+                alt="Monoes mascot"
+                width={300}
+                height={300}
+                className="w-full h-full object-cover"
+              />
             </div>
           </motion.div>
         </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
+import Image from "next/image";
 import type { Project } from "@/lib/projects";
 
 if (typeof window !== "undefined") {
@@ -13,6 +14,13 @@ if (typeof window !== "undefined") {
 interface ProjectSectionProps {
   project: Project;
 }
+
+const monkeyImages: Record<string, string> = {
+  "mono-agent": "/images/monkey/mischievous-grin.jpg",
+  "monobrain": "/images/monkey/thoughtful-ponder.jpg",
+  "mono-clip": "/images/monkey/playful-wink.jpg",
+  "monotask": "/images/monkey/cross-legged.jpg",
+};
 
 export function ProjectSection({ project }: ProjectSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -154,10 +162,14 @@ export function ProjectSection({ project }: ProjectSectionProps) {
               className="absolute inset-0 rounded-full blur-2xl opacity-10"
               style={{ backgroundColor: project.accent }}
             />
-            {/* Monkey persona placeholder */}
-            <span className="text-7xl lg:text-9xl select-none" aria-hidden>
-              🐒
-            </span>
+            {/* Monkey persona */}
+            <Image
+              src={monkeyImages[project.id] || "/images/monkey/hero-full.jpg"}
+              alt={`${project.name} mascot`}
+              width={200}
+              height={200}
+              className="rounded-full object-cover object-top w-full h-full"
+            />
           </div>
         </div>
       </div>
