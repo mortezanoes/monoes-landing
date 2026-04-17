@@ -16,10 +16,10 @@ interface ProjectSectionProps {
 }
 
 const monkeyImages: Record<string, string> = {
-  "mono-agent": "/images/monkey/mischievous-grin.jpg",
-  "monobrain": "/images/monkey/thoughtful-ponder.jpg",
-  "mono-clip": "/images/monkey/playful-wink.jpg",
-  "monotask": "/images/monkey/cross-legged.jpg",
+  "mono-agent": "/images/monkey/coding-laptop.png",
+  "monobrain": "/images/monkey/meditating-brain.png",
+  "mono-clip": "/images/monkey/clipboard-thumbsup.png",
+  "monotask": "/images/monkey/task-board.png",
 };
 
 export function ProjectSection({ project }: ProjectSectionProps) {
@@ -103,25 +103,25 @@ export function ProjectSection({ project }: ProjectSectionProps) {
           {/* Project number */}
           <div className="space-y-1">
             <p
-              className="text-xs uppercase tracking-label font-light"
+              className="text-xs uppercase tracking-label font-semibold"
               style={{ color: project.accent }}
             >
               {project.number}
             </p>
             <p
-              className="text-xs uppercase tracking-label text-gold-muted"
+              className="text-xs uppercase tracking-label text-espresso/50 font-medium"
             >
               {project.language}
             </p>
           </div>
 
           {/* Tagline / headline */}
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-extralight tracking-tight text-espresso leading-tight max-w-xl">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-light tracking-tight text-espresso leading-tight max-w-xl">
             {project.tagline}
           </h2>
 
           {/* Description */}
-          <p className="text-base md:text-lg text-gold-bronze font-light max-w-lg leading-relaxed">
+          <p className="text-base md:text-lg text-espresso/65 font-normal max-w-lg leading-relaxed">
             {project.description}
           </p>
 
@@ -134,8 +134,8 @@ export function ProjectSection({ project }: ProjectSectionProps) {
                 style={{ borderColor: project.accent }}
               >
                 <span className="text-xl">{feature.icon}</span>
-                <p className="text-sm font-medium text-espresso">{feature.title}</p>
-                <p className="text-xs text-gold-bronze leading-snug">{feature.description}</p>
+                <p className="text-sm font-semibold text-espresso">{feature.title}</p>
+                <p className="text-xs text-espresso/60 leading-snug">{feature.description}</p>
               </div>
             ))}
           </div>

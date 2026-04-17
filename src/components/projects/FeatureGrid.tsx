@@ -1,10 +1,9 @@
 "use client";
 
-import { MagneticCard } from "@/components/ui/MagneticCard";
-import type { Project } from "@/lib/projects";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import type { Project } from "@/lib/projects";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -16,26 +15,79 @@ export function FeatureGrid({ project }: { project: Project }) {
   useEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
-    const cards = grid.querySelectorAll(".feature-card");
-    gsap.from(cards, {
-      y: 20, opacity: 0, stagger: 0.05, ease: "power2.out",
-      scrollTrigger: { trigger: grid, start: "top 80%", once: true },
+    const cards = grid.querySelectorAll<HTMLElement>(".feature-card");
+    // Set initial state first so cards are invisible before the trigger fires
+    gsap.set(cards, { opacity: 0, y: 28 });
+    gsap.to(cards, {
+      opacity: 1,
+      y: 0,
+      stagger: 0.07,
+      duration: 0.55,
+      ease: "power2.out",
+      scrollTrigger: { trigger: grid, start: "top 82%", once: true },
     });
   }, []);
 
   return (
-    <section className="bg-ivory px-8 py-20">
+    <section className="bg-ivory-parchment px-8 py-24">
       <div className="mx-auto max-w-6xl">
-        <p className="mb-8 text-xs uppercase tracking-label text-gold">Key Features</p>
-        <div ref={gridRef} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Section header */}
+        <div className="mb-14 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p
+              className="mb-3 text-xs uppercase tracking-label font-semibold"
+              style={{ color: project.accent }}
+            >
+              Key Features
+            </p>
+            <h2 className="text-3xl font-semibold text-espresso md:text-4xl leading-tight">
+              Everything you need.
+              <br className="hidden md:block" /> Nothing you don&apos;t.
+            </h2>
+          </div>
+          <p className="font-mono text-sm text-espresso/30">
+            {project.features.length} capabilities
+          </p>
+        </div>
+
+        {/* Grid */}
+        <div
+          ref={gridRef}
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {project.features.map((feat, i) => (
-            <MagneticCard key={i} className="feature-card rounded-xl border border-ivory-linen bg-white p-6 shadow-soft">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg text-lg" style={{ background: `${project.accent}15` }}>
+            <div
+              key={i}
+              className="feature-card group relative rounded-2xl border border-espresso/10 bg-white p-7 shadow-soft transition-[border-color,box-shadow] duration-200 hover:border-espresso/20 hover:shadow-soft-lg"
+              style={{ opacity: 0 }}
+            >
+              {/* Index */}
+              <span className="absolute top-5 right-6 font-mono text-xs text-espresso/20">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+
+              {/* Icon */}
+              <div
+                className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
+                style={{ backgroundColor: project.accent, opacity: 0.9 }}
+              >
                 {feat.icon}
               </div>
-              <h3 className="mb-1 font-medium text-espresso">{feat.title}</h3>
-              <p className="text-sm leading-relaxed text-gold-bronze">{feat.description}</p>
-            </MagneticCard>
+
+              {/* Text */}
+              <h3 className="mb-2 text-base font-semibold text-espresso leading-snug">
+                {feat.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-espresso/60">
+                {feat.description}
+              </p>
+
+              {/* Accent bar on hover */}
+              <div
+                className="mt-6 h-0.5 w-8 rounded-full transition-all duration-300 group-hover:w-14"
+                style={{ backgroundColor: project.accent }}
+              />
+            </div>
           ))}
         </div>
       </div>

@@ -35,15 +35,15 @@ export function Navbar() {
             : "1px solid transparent",
         }}
       >
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-3">
           <Image
-            src="/images/monkey/hero-full.jpg"
+            src="/images/monkey/welcoming-arms.png"
             alt="Monoes"
-            width={28}
-            height={28}
-            className="h-7 w-7 rounded-full object-cover object-top"
+            width={36}
+            height={36}
+            className="h-9 w-9 rounded-full object-cover object-top shadow-soft"
           />
-          <span className="text-xs font-medium uppercase tracking-label text-espresso">
+          <span className="text-sm font-semibold uppercase tracking-widest text-espresso">
             Monoes
           </span>
         </Link>

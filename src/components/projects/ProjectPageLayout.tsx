@@ -9,19 +9,30 @@ export function ProjectPageLayout({ project, demo }: { project: Project; demo: R
   return (
     <main className="pt-0">
       <ProjectHero project={project} />
-      <section className="bg-ivory px-8 py-20">
+
+      {/* Demo — dark so canvas/widget stands out naturally */}
+      <section className="bg-espresso px-8 py-16">
         <div className="mx-auto max-w-6xl">
-          <p className="mb-8 text-xs uppercase tracking-label text-gold">Interactive Demo</p>
+          <p className="mb-6 text-xs uppercase tracking-label font-medium" style={{ color: project.accent }}>
+            Interactive Demo
+          </p>
           {demo}
         </div>
       </section>
+
       <FeatureGrid project={project} />
-      <section className="bg-ivory-warm px-8 py-20">
+
+      {/* Install */}
+      <section className="bg-ivory-warm px-8 py-20 border-t border-ivory-linen">
         <div className="mx-auto max-w-4xl">
-          <p className="mb-8 text-xs uppercase tracking-label text-gold">Get Started</p>
+          <p className="mb-2 text-xs uppercase tracking-label font-medium text-gold-dark">Get Started</p>
+          <h2 className="mb-8 text-2xl font-semibold text-espresso tracking-tight">
+            Up and running in seconds.
+          </h2>
           <TerminalBlock lines={project.install} />
         </div>
       </section>
+
       <CrossLinks current={project.id} />
     </main>
   );

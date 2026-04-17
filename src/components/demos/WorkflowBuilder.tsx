@@ -8,176 +8,207 @@ interface Node {
   icon: string;
   x: number;
   y: number;
+  category: "trigger" | "browser" | "ai" | "output";
 }
 
 const NODES: Node[] = [
-  { id: "cron", label: "Cron Trigger", icon: "⏰", x: 40, y: 50 },
-  { id: "chrome", label: "Open Chrome", icon: "🌐", x: 220, y: 50 },
-  { id: "ai", label: "AI Generate", icon: "✨", x: 400, y: 50 },
-  { id: "post", label: "Post Content", icon: "📤", x: 580, y: 50 },
+  { id: "cron",   label: "Cron Trigger",   icon: "⏰", x: 60,  y: 60,  category: "trigger"  },
+  { id: "chrome", label: "Open Chrome",    icon: "🌐", x: 260, y: 60,  category: "browser"  },
+  { id: "scrape", label: "Scrape Data",    icon: "🔍", x: 460, y: 60,  category: "browser"  },
+  { id: "ai",     label: "AI Generate",    icon: "✨", x: 260, y: 180, category: "ai"       },
+  { id: "filter", label: "Filter Results", icon: "⚡", x: 460, y: 180, category: "ai"       },
+  { id: "post",   label: "Post Content",   icon: "📤", x: 360, y: 300, category: "output"   },
 ];
 
 const EDGES = [
-  { from: "cron", to: "chrome" },
-  { from: "chrome", to: "ai" },
-  { from: "ai", to: "post" },
+  { from: "cron",   to: "chrome" },
+  { from: "chrome", to: "scrape" },
+  { from: "chrome", to: "ai"     },
+  { from: "scrape", to: "filter" },
+  { from: "ai",     to: "filter" },
+  { from: "filter", to: "post"   },
 ];
 
-const NODE_W = 120;
-const NODE_H = 56;
-const CANVAS_H = 160;
+const CATEGORY_COLOR: Record<Node["category"], string> = {
+  trigger: "#C8A97E",
+  browser: "#8B7355",
+  ai:      "#B8956A",
+  output:  "#A07840",
+};
+
+const NODE_W = 140;
+const NODE_H = 60;
+const CANVAS_W = 700;
+const CANVAS_H = 380;
 
 export function WorkflowBuilder() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [activeNode, setActiveNode] = useState<string | null>(null);
-  const [autoPlay, setAutoPlay] = useState(false);
-  const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const autoPlayIndexRef = useRef(0);
+  const [activeNode,  setActiveNode]  = useState<string | null>(null);
+  const [running,     setRunning]     = useState(false);
+  const [runIdx,      setRunIdx]      = useState(-1);
+  const runTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const getNodeCenter = useCallback((node: Node) => ({
+  // execution path through the DAG
+  const RUN_SEQ = ["cron", "chrome", "scrape", "ai", "filter", "post"];
+
+  const getCenter = (node: Node) => ({
     x: node.x + NODE_W / 2,
-    y: CANVAS_H / 2,
-  }), []);
+    y: node.y + NODE_H / 2,
+  });
 
-  const drawEdges = useCallback((ctx: CanvasRenderingContext2D, active: string | null) => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    EDGES.forEach((edge) => {
-      const fromNode = NODES.find((n) => n.id === edge.from)!;
-      const toNode = NODES.find((n) => n.id === edge.to)!;
-      const from = getNodeCenter(fromNode);
-      const to = getNodeCenter(toNode);
-
-      const isActive =
-        active === edge.from || active === edge.to;
-
-      ctx.beginPath();
-      ctx.moveTo(from.x + NODE_W / 2 - 4, from.y);
-      ctx.lineTo(to.x - NODE_W / 2 + 4, to.y);
-      ctx.strokeStyle = isActive ? "#C8A97E" : "#D4C5B0";
-      ctx.lineWidth = isActive ? 2 : 1.5;
-      ctx.stroke();
-
-      // Arrow head
-      const angle = Math.atan2(to.y - from.y, to.x - from.x);
-      const arrowX = to.x - NODE_W / 2 + 4;
-      const arrowY = to.y;
-      ctx.beginPath();
-      ctx.moveTo(arrowX, arrowY);
-      ctx.lineTo(arrowX - 8 * Math.cos(angle - 0.4), arrowY - 8 * Math.sin(angle - 0.4));
-      ctx.lineTo(arrowX - 8 * Math.cos(angle + 0.4), arrowY - 8 * Math.sin(angle + 0.4));
-      ctx.closePath();
-      ctx.fillStyle = isActive ? "#C8A97E" : "#D4C5B0";
-      ctx.fill();
-    });
-  }, [getNodeCenter]);
-
-  useEffect(() => {
+  const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    drawEdges(ctx, activeNode);
-  }, [activeNode, drawEdges]);
 
-  const startIdleTimer = useCallback(() => {
-    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    idleTimerRef.current = setTimeout(() => {
-      setAutoPlay(true);
-    }, 3000);
-  }, []);
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = CANVAS_W * dpr;
+    canvas.height = CANVAS_H * dpr;
+    canvas.style.width  = CANVAS_W + "px";
+    canvas.style.height = CANVAS_H + "px";
+    ctx.scale(dpr, dpr);
 
-  const stopAutoPlay = useCallback(() => {
-    setAutoPlay(false);
-    if (autoPlayRef.current) clearInterval(autoPlayRef.current);
-    autoPlayRef.current = null;
-    autoPlayIndexRef.current = 0;
-  }, []);
+    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
-  useEffect(() => {
-    startIdleTimer();
-    return () => {
-      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    };
-  }, [startIdleTimer]);
+    EDGES.forEach((edge) => {
+      const fn = NODES.find((n) => n.id === edge.from)!;
+      const tn = NODES.find((n) => n.id === edge.to)!;
+      const fc = getCenter(fn);
+      const tc = getCenter(tn);
 
-  useEffect(() => {
-    if (!autoPlay) return;
+      const runningIdx = RUN_SEQ.indexOf(edge.from);
+      const isLit = running && runIdx >= runningIdx && runIdx > RUN_SEQ.indexOf(edge.to) - 1;
+      const isHover = activeNode === edge.from || activeNode === edge.to;
 
-    autoPlayRef.current = setInterval(() => {
-      const idx = autoPlayIndexRef.current;
-      setActiveNode(NODES[idx].id);
-      autoPlayIndexRef.current = (idx + 1) % NODES.length;
-    }, 800);
+      ctx.beginPath();
+      ctx.setLineDash(isLit ? [] : [5, 4]);
+      ctx.moveTo(fc.x + (tc.x > fc.x ? NODE_W / 2 : tc.x < fc.x ? -NODE_W / 2 : 0),
+                 fc.y + (tc.y > fc.y ? NODE_H / 2 : tc.y < fc.y ? -NODE_H / 2 : 0));
+      ctx.lineTo(tc.x + (fc.x > tc.x ? NODE_W / 2 : fc.x < tc.x ? -NODE_W / 2 : 0),
+                 tc.y + (fc.y > tc.y ? NODE_H / 2 : fc.y < tc.y ? -NODE_H / 2 : 0));
+      ctx.strokeStyle = isLit ? "#C8A97E" : isHover ? "#8B7355" : "rgba(255,255,240,0.12)";
+      ctx.lineWidth = isLit ? 2 : 1.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+  }, [activeNode, running, runIdx]);
 
-    return () => {
-      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
-    };
-  }, [autoPlay]);
+  useEffect(() => { drawCanvas(); }, [drawCanvas]);
 
-  const handleNodeClick = (nodeId: string) => {
-    stopAutoPlay();
-    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    setActiveNode((prev) => (prev === nodeId ? null : nodeId));
-    startIdleTimer();
+  const startRun = () => {
+    if (running) return;
+    setRunning(true);
+    setRunIdx(0);
+    setActiveNode(null);
+    let i = 0;
+    runTimer.current = setInterval(() => {
+      i++;
+      setRunIdx(i);
+      if (i >= RUN_SEQ.length) {
+        clearInterval(runTimer.current!);
+        setTimeout(() => { setRunning(false); setRunIdx(-1); }, 1000);
+      }
+    }, 650);
   };
+
+  useEffect(() => () => { if (runTimer.current) clearInterval(runTimer.current); }, []);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-2xl bg-ivory-warm border border-ivory-linen p-4 overflow-hidden select-none"
-      style={{ minHeight: 200 }}
+      className="relative w-full rounded-2xl border border-espresso/10 bg-espresso overflow-hidden select-none"
     >
-      <p className="text-xs tracking-label text-gold-bronze mb-3 uppercase">
-        Workflow DAG
-      </p>
+      {/* Header bar */}
+      <div className="flex items-center justify-between border-b border-ivory/6 px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1.5">
+            <span className="h-3 w-3 rounded-full bg-ivory/10" />
+            <span className="h-3 w-3 rounded-full bg-ivory/10" />
+            <span className="h-3 w-3 rounded-full bg-ivory/10" />
+          </div>
+          <p className="text-xs uppercase tracking-label text-ivory/40 font-medium ml-2">
+            Workflow DAG — Content Autopilot
+          </p>
+        </div>
+        <button
+          onClick={startRun}
+          disabled={running}
+          className="flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-medium transition-all"
+          style={{
+            background: running ? "rgba(200,169,126,0.15)" : "#C8A97E",
+            color: running ? "#C8A97E" : "#2A2318",
+          }}
+        >
+          {running ? (
+            <>
+              <span className="h-2 w-2 rounded-full bg-gold animate-pulse" />
+              Running…
+            </>
+          ) : (
+            <>▶ Run Workflow</>
+          )}
+        </button>
+      </div>
 
-      {/* Canvas for edges */}
-      <div className="relative" style={{ height: CANVAS_H }}>
+      {/* Canvas area */}
+      <div className="relative p-4" style={{ height: CANVAS_H + 32 }}>
         <canvas
           ref={canvasRef}
-          width={740}
-          height={CANVAS_H}
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ zIndex: 0 }}
+          className="absolute inset-4 pointer-events-none"
+          style={{ width: CANVAS_W, height: CANVAS_H }}
         />
 
         {/* Nodes */}
         {NODES.map((node) => {
-          const isActive = activeNode === node.id;
+          const isActive  = activeNode === node.id;
+          const runSeqIdx = RUN_SEQ.indexOf(node.id);
+          const isDone    = running && runIdx > runSeqIdx;
+          const isCurrent = running && runIdx === runSeqIdx;
+          const color     = CATEGORY_COLOR[node.category];
+
           return (
             <button
               key={node.id}
-              onClick={() => handleNodeClick(node.id)}
-              className="absolute flex flex-col items-center justify-center gap-1 rounded-xl border transition-all duration-200 cursor-pointer"
+              onClick={() => !running && setActiveNode((p) => p === node.id ? null : node.id)}
+              className="absolute flex flex-col items-center justify-center gap-1 rounded-xl border transition-all duration-200"
               style={{
                 left: node.x,
-                top: "50%",
-                transform: `translateY(-50%) scale(${isActive ? 1.08 : 1})`,
+                top: node.y + 16,
                 width: NODE_W,
                 height: NODE_H,
-                zIndex: 1,
-                background: isActive ? "#2A2318" : "#FFFFF0",
-                borderColor: isActive ? "#C8A97E" : "#EDE5D8",
-                borderWidth: isActive ? 2 : 1,
-                boxShadow: isActive
-                  ? "0 0 0 4px rgba(200,169,126,0.2), 0 4px 16px rgba(42,35,24,0.12)"
-                  : "0 4px 24px rgba(42,35,24,0.04)",
+                background: isCurrent
+                  ? `${color}22`
+                  : isDone
+                  ? "rgba(255,255,240,0.06)"
+                  : isActive
+                  ? "rgba(255,255,240,0.08)"
+                  : "rgba(255,255,240,0.04)",
+                borderColor: isCurrent
+                  ? color
+                  : isDone
+                  ? "rgba(255,255,240,0.15)"
+                  : isActive
+                  ? "rgba(255,255,240,0.2)"
+                  : "rgba(255,255,240,0.08)",
+                borderWidth: isCurrent ? 1.5 : 1,
+                boxShadow: isCurrent
+                  ? `0 0 20px ${color}30`
+                  : "none",
+                transform: `scale(${isCurrent ? 1.05 : 1})`,
               }}
             >
-              {isActive && (
+              {/* Status dot */}
+              {(isDone || isCurrent) && (
                 <span
-                  className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gold animate-pulse"
-                  style={{ zIndex: 2 }}
+                  className={`absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full border border-espresso ${isCurrent ? "animate-pulse" : ""}`}
+                  style={{ background: isDone ? "#5cb85c" : color }}
                 />
               )}
               <span className="text-lg leading-none">{node.icon}</span>
-              <span
-                className="text-xs font-medium leading-tight text-center px-1"
-                style={{ color: isActive ? "#C8A97E" : "#2A2318" }}
-              >
+              <span className="text-xs font-medium leading-tight text-center px-2"
+                style={{ color: isCurrent ? color : isDone ? "rgba(255,255,240,0.6)" : "rgba(255,255,240,0.5)" }}>
                 {node.label}
               </span>
             </button>
@@ -185,8 +216,21 @@ export function WorkflowBuilder() {
         })}
       </div>
 
-      <div className="mt-2 text-xs text-gold-bronze/60 text-center">
-        {autoPlay ? "Auto-playing…" : "Click a node to highlight"}
+      {/* Footer stats */}
+      <div className="border-t border-ivory/6 px-6 py-3 flex items-center gap-6">
+        {[
+          { label: "Nodes", value: NODES.length },
+          { label: "Edges", value: EDGES.length },
+          { label: "Status", value: running ? "Executing" : runIdx >= RUN_SEQ.length - 1 && runIdx > 0 ? "Complete" : "Idle" },
+        ].map(({ label, value }) => (
+          <div key={label} className="flex items-center gap-2">
+            <span className="text-xs text-ivory/30">{label}</span>
+            <span className="text-xs font-mono font-medium text-ivory/60">{value}</span>
+          </div>
+        ))}
+        <div className="ml-auto text-xs text-ivory/25">
+          {running ? `Step ${Math.min(runIdx + 1, RUN_SEQ.length)} / ${RUN_SEQ.length}` : "Click ▶ to execute"}
+        </div>
       </div>
     </div>
   );

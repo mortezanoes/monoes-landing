@@ -36,6 +36,14 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Normal cursor always */
+*, *::before, *::after {
+  cursor: inherit;
+}
+body {
+  cursor: default;
+}
+
 /* Selection color */
 ::selection {
   background: rgba(200, 169, 126, 0.3);

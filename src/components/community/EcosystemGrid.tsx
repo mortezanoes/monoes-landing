@@ -11,7 +11,7 @@ export function EcosystemGrid({ stats }: { stats: Record<string, { stars: number
           {projects.map((project) => {
             const repoStats = stats[project.repo];
             return (
-              <Link key={project.id} href={`/${project.slug}`}>
+              <Link key={project.id} href={`/projects/${project.slug}`}>
                 <MagneticCard className="rounded-xl border border-ivory-linen bg-white p-5 shadow-soft">
                   <div className="mb-3 flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold text-white" style={{ background: `linear-gradient(135deg, ${project.accent}, ${project.accent}aa)` }}>

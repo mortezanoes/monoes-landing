@@ -121,7 +121,7 @@ export function HeroSection() {
         const alpha = 0.3 + progress * 0.7;
         ctx.beginPath();
         ctx.arc(displayX, displayY, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(200, 169, 126, ${alpha})`;
+        ctx.fillStyle = `rgba(139, 99, 36, ${alpha * 0.55})`;
         ctx.fill();
       }
 
@@ -188,7 +188,7 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[200vh] bg-espresso-deep"
+      className="relative h-[200vh] bg-ivory"
     >
       {/* Sticky inner container */}
       <div className="sticky top-0 h-screen overflow-hidden">
@@ -204,18 +204,21 @@ export function HeroSection() {
           className="relative flex flex-col items-center justify-center h-full text-center px-6"
           style={{ zIndex: 2 }}
         >
+          {/* Brand wordmark above headline */}
+          <p className="mb-6 text-xs uppercase tracking-label text-gold-bronze font-medium">
+            monoes
+          </p>
           <h1
             ref={titleRef}
-            className="text-4xl md:text-6xl lg:text-7xl font-extralight tracking-tight text-ivory max-w-4xl leading-tight"
+            className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight text-espresso max-w-4xl leading-none"
             style={{ opacity: 0 }}
           >
             Tools that think{" "}
-            <span className="text-gold">with you</span>,{" "}
-            not for you
+            <span className="text-gold-warm">with you</span>
           </h1>
           <p
             ref={subtitleRef}
-            className="mt-6 text-lg md:text-xl text-gold-muted tracking-wide max-w-md"
+            className="mt-8 text-lg md:text-xl text-gold-bronze tracking-wide max-w-md font-light"
             style={{ opacity: 0 }}
           >
             Four open-source instruments. One philosophy.
@@ -228,11 +231,11 @@ export function HeroSection() {
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
           style={{ zIndex: 2 }}
         >
-          <p className="text-xs uppercase tracking-label text-gold-muted">
+          <p className="text-xs uppercase tracking-label text-gold-bronze">
             Scroll to discover
           </p>
           <div
-            className="w-px h-8 bg-gold-muted animate-bounce"
+            className="w-px h-8 bg-gold-bronze animate-bounce"
             style={{ animationDuration: "1.5s" }}
           />
         </div>

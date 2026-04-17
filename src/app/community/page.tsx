@@ -11,18 +11,18 @@ export default async function CommunityPage() {
 
   return (
     <main>
-      <section className="flex min-h-[50vh] items-center justify-center bg-espresso px-8 pt-16 text-center">
+      <section className="flex min-h-[50vh] items-center justify-center bg-ivory-warm px-8 pt-16 text-center border-b border-ivory-linen">
         <div>
-          <p className="mb-4 text-xs uppercase tracking-label text-gold">Open Source</p>
-          <h1 className="mb-4 text-4xl font-extralight text-ivory md:text-5xl">
+          <p className="mb-4 text-xs uppercase tracking-label text-gold-dark font-medium">Open Source</p>
+          <h1 className="mb-4 text-4xl font-semibold text-espresso md:text-5xl tracking-tight">
             Built in the open.<br />Shaped by the troop.
           </h1>
-          <p className="mb-8 text-gold/50">Every line of monoes is open source. Every contribution matters.</p>
+          <p className="mb-8 text-espresso/55 text-lg font-light">Every line of monoes is open source. Every contribution matters.</p>
           <div className="flex justify-center gap-3">
-            <a href="https://github.com/nokhodian" target="_blank" rel="noopener noreferrer" className="gold-gradient rounded-md px-5 py-2 text-sm font-medium text-white">
+            <a href="https://github.com/nokhodian" target="_blank" rel="noopener noreferrer" className="bg-espresso text-ivory rounded-md px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80">
               View on GitHub ↗
             </a>
-            <Link href="#contribute" className="rounded-md border border-gold/30 px-5 py-2 text-sm text-gold transition-colors hover:border-gold">
+            <Link href="#contribute" className="rounded-md border border-espresso/30 px-5 py-2 text-sm text-espresso font-medium transition-colors hover:border-espresso">
               Contributing Guide
             </Link>
           </div>
@@ -32,10 +32,10 @@ export default async function CommunityPage() {
       <EcosystemGrid stats={stats} />
       <div id="contribute"><ContributeSteps /></div>
       <TechStack />
-      <section className="bg-espresso-deep px-8 py-20 text-center">
-        <h2 className="mb-3 text-3xl font-extralight text-ivory">Every tool started with a single commit.</h2>
-        <p className="mb-8 text-gold/50">What will yours be?</p>
-        <a href="https://github.com/nokhodian" target="_blank" rel="noopener noreferrer" className="gold-gradient inline-block rounded-md px-6 py-2.5 text-sm font-medium text-white">
+      <section className="bg-ivory-parchment px-8 py-20 text-center border-t border-ivory-linen">
+        <h2 className="mb-3 text-3xl font-semibold text-espresso tracking-tight">Every tool started with a single commit.</h2>
+        <p className="mb-8 text-espresso/55 text-lg font-light">What will yours be?</p>
+        <a href="https://github.com/nokhodian" target="_blank" rel="noopener noreferrer" className="bg-espresso text-ivory inline-block rounded-md px-6 py-2.5 text-sm font-medium transition-opacity hover:opacity-80">
           Start Contributing →
         </a>
       </section>
