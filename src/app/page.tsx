@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { PhilosophySection } from "@/components/landing/PhilosophySection";
 import { ProjectSection } from "@/components/landing/ProjectSection";
 import { CommunityTeaser } from "@/components/landing/CommunityTeaser";
+import { ScrollMonkey } from "@/components/ui/ScrollMonkey";
 import { projects } from "@/lib/projects";
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
         ))}
       </div>
       <CommunityTeaser />
+      <ScrollMonkey />
     </main>
   );
 }
