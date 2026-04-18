@@ -7,11 +7,11 @@ export function Footer() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex items-center justify-center">
           <Image
-            src="/images/nokhodian-logo.png"
-            alt="Nokhodian"
-            width={80}
-            height={80}
-            className="mx-auto mb-4 opacity-25"
+            src="/images/logo.png"
+            alt="Monoes"
+            width={60}
+            height={60}
+            className="mx-auto mb-4 opacity-70"
           />
         </div>
         <div className="mb-6 flex items-center justify-center gap-8 text-sm text-gold-bronze">
