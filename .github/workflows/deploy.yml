@@ -25,6 +25,9 @@ jobs:
 
       - run: npx @opennextjs/cloudflare build
 
+      - name: Prepare Pages output
+        run: cp .open-next/worker.js .open-next/assets/_worker.js
+
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy .open-next/assets --project-name=monoes-landing
         env:
